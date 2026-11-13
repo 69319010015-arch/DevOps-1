@@ -58,9 +58,11 @@
     .avatar-stack span:nth-child(1) { background: #edac77; }
     .avatar-stack span:nth-child(2) { background: #718bc4; }
     .avatar-stack span:nth-child(3) { background: #67b898; }
-    .hero-art { position: relative; min-height: 350px; display: grid; place-items: center; }
+    .hero-art { position: relative; min-height: 350px; display: grid; place-items: center; isolation: isolate; }
+    .hero-art::before { content: ''; position: absolute; inset: 12% 2% 5% 12%; z-index: -1; opacity: .48; background-image: radial-gradient(#b79be9 1px, transparent 1px); background-size: 15px 15px; mask-image: radial-gradient(ellipse, #000 15%, transparent 72%); }
     .orb { position: absolute; width: 310px; height: 310px; border-radius: 50%; background: linear-gradient(140deg, #e8dcff, #f5f0ff 75%); }
-    .dashboard-card { position: relative; width: min(100%, 360px); padding: 22px; background: #fff; border: 1px solid #edf1f7; border-radius: 20px; box-shadow: 0 25px 65px #395d8b20; transform: rotate(1deg); }
+    .technician-art { position: absolute; z-index: 0; top: -4px; right: -3px; width: 230px; height: auto; overflow: visible; filter: drop-shadow(0 15px 18px #7255a522); animation: float-art 5s ease-in-out infinite; }
+    .dashboard-card { position: relative; z-index: 1; width: min(100%, 345px); padding: 22px; background: #fff; border: 1px solid #edf1f7; border-radius: 20px; box-shadow: 0 25px 65px #66508b20; transform: translate(-13px, 17px) rotate(1deg); }
     .dashboard-head { display: flex; align-items: center; justify-content: space-between; }
     .dashboard-title { color: #77869b; font-size: 10px; font-weight: 600; }
     .menu-dots { color: #a7b2c0; font-size: 19px; line-height: 1; }
@@ -84,6 +86,7 @@
     .float-check { position: absolute; right: -9px; bottom: 36px; display: flex; align-items: center; gap: 9px; padding: 11px 14px; background: #fff; border: 1px solid #edf1f7; border-radius: 13px; box-shadow: 0 12px 30px #395d8b1c; font-size: 10px; font-weight: 700; }
     .check-icon { width: 25px; height: 25px; display: grid; place-items: center; color: #1d9a70; background: #e7f8f1; border-radius: 8px; }
     .check-icon svg { width: 14px; height: 14px; }
+    @keyframes float-art { 0%, 100% { transform: translateY(0) rotate(1deg); } 50% { transform: translateY(-8px) rotate(-1deg); } }
 
     .section { padding: 72px 0; }
     .section-heading { max-width: 540px; margin: 0 auto 36px; text-align: center; }
@@ -183,9 +186,10 @@
       .hero-actions { gap: 15px; margin-top: 22px; }
       .button-primary { padding: 13px 15px; font-size: 11px; }
       .hero-note { margin-top: 20px; }
-      .hero-art { min-height: 286px; margin-top: 0; }
+      .hero-art { min-height: 310px; margin-top: 0; }
       .orb { width: 250px; height: 250px; }
-      .dashboard-card { width: min(100% - 18px, 340px); padding: 18px; }
+      .technician-art { top: -8px; right: -8px; width: 205px; }
+      .dashboard-card { width: min(100% - 30px, 330px); padding: 18px; transform: translate(-22px, 22px) rotate(1deg); }
       .float-check { right: 0; bottom: 22px; }
       .section { padding: 56px 0; }
       .section-heading { margin-bottom: 25px; }
@@ -247,8 +251,42 @@
           </div>
           <div class="hero-note"><div class="avatar-stack" aria-hidden="true"><span>น</span><span>ช</span><span>อ</span></div><span>ทีมช่างพร้อมดูแลทุกวันทำการ</span></div>
         </div>
-        <div class="hero-art" aria-label="ตัวอย่างสถานะการซ่อม">
+        <div class="hero-art" aria-label="ภาพประกอบช่างกำลังเตรียมอุปกรณ์และตัวอย่างสถานะการซ่อม">
           <div class="orb" aria-hidden="true"></div>
+          <svg class="technician-art" viewBox="0 0 280 300" role="img" aria-labelledby="technician-title">
+            <title id="technician-title">ช่างซ่อมพร้อมอุปกรณ์</title>
+            <circle cx="152" cy="143" r="116" fill="#eee6ff" />
+            <circle cx="48" cy="82" r="5" fill="#a98ae8" />
+            <circle cx="241" cy="105" r="7" fill="#d5c4f7" />
+            <path d="m37 126 4 9 9 4-9 4-4 9-4-9-9-4 9-4 4-9Z" fill="#bba2ed" />
+            <path d="m226 46 3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7Z" fill="#8b5cf6" />
+            <ellipse cx="147" cy="270" rx="89" ry="13" fill="#d8c9f3" opacity=".55" />
+            <path d="M77 232h67v38H77z" rx="7" fill="#7850d1" />
+            <path d="M77 239h67v8H77z" fill="#9d78e9" />
+            <rect x="99" y="222" width="24" height="12" rx="5" fill="#6540bd" />
+            <rect x="88" y="253" width="14" height="5" rx="2.5" fill="#cbb8f2" />
+            <rect x="117" y="253" width="14" height="5" rx="2.5" fill="#cbb8f2" />
+            <path d="M152 151c0-12 10-22 22-22h20c13 0 23 10 23 23v48h-65v-49Z" fill="#6e4ac1" />
+            <path d="M169 159h25v42h-25z" fill="#fff" opacity=".16" />
+            <path d="m165 195-8 43h-19l7-53M202 194l9 44h19l-7-54" fill="#f2bd99" stroke="#e7a77e" stroke-width="2" stroke-linejoin="round" />
+            <path d="M139 233h22l-5 39h-24l7-39ZM202 233h21l10 39h-24l-7-39Z" fill="#34466d" />
+            <path d="M132 267h27c5 0 8 4 8 8v3h-39v-4c0-4 2-7 4-7ZM207 267h25c5 0 8 4 8 8v3h-38v-4c0-4 2-7 5-7Z" fill="#263654" />
+            <rect x="160" y="91" width="43" height="55" rx="19" fill="#f1b58d" />
+            <path d="M158 112c-4-20 8-34 25-34 16 0 27 12 25 31-4-5-7-12-8-18-8 8-22 12-40 11l-2 10Z" fill="#293553" />
+            <path d="M158 100c-12 0-17-8-14-17 8 5 17 2 22-5 8 6 22 7 35 1 4 8 12 11 19 8 2 11-4 17-13 18" fill="#8b5cf6" />
+            <path d="M162 94c10 3 24 2 35-5" fill="none" stroke="#cdb9f5" stroke-width="3" stroke-linecap="round" />
+            <circle cx="174" cy="117" r="2" fill="#503c43" />
+            <circle cx="192" cy="117" r="2" fill="#503c43" />
+            <path d="M178 128c4 3 8 3 12 0" fill="none" stroke="#b86e61" stroke-width="2" stroke-linecap="round" />
+            <path d="m173 144 9 13 9-13" fill="#fff" />
+            <path d="M151 158c-8 4-16 13-22 24l-16 24c-4 6 4 12 9 7l29-24 13-20" fill="#6e4ac1" />
+            <path d="m113 204-9 14" stroke="#f1b58d" stroke-width="9" stroke-linecap="round" />
+            <path d="m226 157 12 29 13 18c4 6-4 12-9 7l-21-19-14-25" fill="#6e4ac1" />
+            <path d="m246 204 10 10" stroke="#f1b58d" stroke-width="9" stroke-linecap="round" />
+            <path d="m257 213 8 8m-14-5 7 9m2-18 9 5" fill="none" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round" />
+            <path d="M178 164h8v20h-8z" fill="#f4c84b" />
+            <path d="M178 188h8v5h-8z" fill="#f4c84b" />
+          </svg>
           <div class="dashboard-card">
             <div class="dashboard-head"><span class="dashboard-title">ภาพรวมคำขอแจ้งซ่อม</span><span class="menu-dots" aria-hidden="true">···</span></div>
             <div class="ticket-preview">
