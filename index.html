@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f6f9fc" />
+  <meta name="description" content="แจ้งซ่อมและติดตามสถานะงานซ่อมได้ง่าย ๆ ในที่เดียว" />
+  <title>FixFlow — ระบบแจ้งซ่อม</title>
+  <style>
+    :root {
+      font-family: 'Noto Sans Thai', 'Segoe UI', Tahoma, sans-serif;
+      color: #172b4d;
+      background: #f6f9fc;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --navy: #172b4d;
+      --muted: #71819a;
+      --blue: #2868e8;
+      --blue-dark: #1d56cc;
+      --line: #e5ebf3;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+    .topbar { height: 78px; display: flex; align-items: center; border-bottom: 1px solid rgba(229, 235, 243, .8); background: rgba(255,255,255,.82); }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; color: white; background: var(--blue); border-radius: 12px; box-shadow: 0 7px 16px #2868e83a; }
+    .brand-mark svg { width: 21px; height: 21px; }
+    .brand em { color: var(--blue); font-style: normal; }
+    .nav-links { display: flex; align-items: center; gap: 32px; color: #5f7089; font-size: 13px; font-weight: 600; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-cta { padding: 11px 17px; color: #fff; background: var(--blue); border-radius: 10px; font-size: 13px; font-weight: 700; transition: .2s ease; }
+    .nav-cta:hover, .button-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+
+    .hero { position: relative; overflow: hidden; padding: 78px 0 76px; background: radial-gradient(ellipse at 82% 45%, #e4efff 0, transparent 38%), linear-gradient(115deg, #f8fbff 5%, #f2f7ff 100%); }
+    .hero::after { content: ''; position: absolute; width: 430px; height: 430px; top: -260px; right: 3%; border: 1px solid #dce8f8; border-radius: 50%; box-shadow: 0 0 0 46px #e8f0fc66, 0 0 0 92px #e8f0fc3b; pointer-events: none; }
+    .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 65px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; color: #285db4; border: 1px solid #d9e7ff; background: #fff; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .eyebrow-dot { width: 7px; height: 7px; background: #36ba88; border-radius: 50%; box-shadow: 0 0 0 3px #36ba8824; }
+    h1 { max-width: 520px; margin: 19px 0 16px; font-size: clamp(38px, 5vw, 57px); line-height: 1.17; letter-spacing: -2px; }
+    h1 span { color: var(--blue); }
+    .hero-copy { max-width: 465px; margin: 0; color: #687b96; font-size: 15px; line-height: 1.9; }
+    .hero-actions { display: flex; align-items: center; gap: 21px; margin-top: 28px; }
+    .button-primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 19px; color: white; background: var(--blue); border: 0; border-radius: 11px; box-shadow: 0 8px 18px #2868e831; font-size: 13px; font-weight: 700; transition: .2s ease; cursor: pointer; }
+    .button-primary svg { width: 17px; height: 17px; }
+    .text-link { display: inline-flex; align-items: center; gap: 7px; color: #536780; font-size: 12px; font-weight: 700; }
+    .text-link svg { width: 15px; color: var(--blue); }
+    .hero-note { display: flex; align-items: center; gap: 9px; margin-top: 27px; color: #8391a5; font-size: 11px; }
+    .avatar-stack { display: flex; padding-left: 4px; }
+    .avatar-stack span { width: 24px; height: 24px; display: grid; place-items: center; margin-left: -4px; color: #fff; border: 2px solid #f5f9ff; border-radius: 50%; font-size: 8px; font-weight: 700; }
+    .avatar-stack span:nth-child(1) { background: #edac77; }
+    .avatar-stack span:nth-child(2) { background: #718bc4; }
+    .avatar-stack span:nth-child(3) { background: #67b898; }
+    .hero-art { position: relative; min-height: 350px; display: grid; place-items: center; }
+    .orb { position: absolute; width: 310px; height: 310px; border-radius: 50%; background: linear-gradient(140deg, #d6e7ff, #edf5ff 75%); }
+    .dashboard-card { position: relative; width: min(100%, 360px); padding: 22px; background: #fff; border: 1px solid #edf1f7; border-radius: 20px; box-shadow: 0 25px 65px #395d8b20; transform: rotate(1deg); }
+    .dashboard-head { display: flex; align-items: center; justify-content: space-between; }
+    .dashboard-title { color: #77869b; font-size: 10px; font-weight: 600; }
+    .menu-dots { color: #a7b2c0; font-size: 19px; line-height: 1; }
+    .ticket-preview { display: flex; align-items: center; gap: 13px; margin-top: 20px; padding: 14px; background: #f8faff; border: 1px solid #edf1f8; border-radius: 13px; }
+    .ticket-icon { width: 39px; height: 39px; display: grid; place-items: center; color: #3471e8; background: #e8f0ff; border-radius: 11px; }
+    .ticket-icon svg { width: 19px; height: 19px; }
+    .ticket-meta { flex: 1; }
+    .ticket-name { font-size: 11px; font-weight: 700; }
+    .ticket-id { margin-top: 4px; color: #8794a7; font-size: 9px; }
+    .status-pill { padding: 6px 9px; color: #26936d; background: #e8f8f1; border-radius: 99px; font-size: 8px; font-weight: 700; }
+    .progress-label { display: flex; justify-content: space-between; margin: 20px 1px 9px; color: #74839a; font-size: 9px; }
+    .progress-label strong { color: #364d6d; }
+    .progress-bar { height: 6px; overflow: hidden; background: #edf1f7; border-radius: 9px; }
+    .progress-bar span { display: block; width: 72%; height: 100%; background: linear-gradient(90deg, #3779f2, #6ea2ff); border-radius: inherit; }
+    .tech-row { display: flex; align-items: center; gap: 11px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #eef1f6; }
+    .tech-avatar { width: 34px; height: 34px; display: grid; place-items: center; color: #a45a39; background: #ffe8d9; border-radius: 50%; font-size: 10px; font-weight: 800; }
+    .tech-info { flex: 1; }
+    .tech-info strong { display: block; font-size: 10px; }
+    .tech-info small { color: #93a0b2; font-size: 8px; }
+    .star-rating { color: #f5ad43; font-size: 10px; }
+    .float-check { position: absolute; right: -9px; bottom: 36px; display: flex; align-items: center; gap: 9px; padding: 11px 14px; background: #fff; border: 1px solid #edf1f7; border-radius: 13px; box-shadow: 0 12px 30px #395d8b1c; font-size: 10px; font-weight: 700; }
+    .check-icon { width: 25px; height: 25px; display: grid; place-items: center; color: #1d9a70; background: #e7f8f1; border-radius: 8px; }
+    .check-icon svg { width: 14px; height: 14px; }
+
+    .section { padding: 72px 0; }
+    .section-heading { max-width: 540px; margin: 0 auto 36px; text-align: center; }
+    .section-kicker { color: var(--blue); font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
+    .section-heading h2 { margin: 9px 0 9px; font-size: 29px; letter-spacing: -.8px; }
+    .section-heading p { margin: 0; color: #7a8aa0; font-size: 12px; line-height: 1.8; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .step-card { position: relative; padding: 23px 23px 21px; background: #fff; border: 1px solid var(--line); border-radius: 15px; }
+    .step-card:not(:last-child)::after { content: ''; position: absolute; width: 28px; top: 41px; right: -26px; border-top: 1px dashed #cbd8eb; }
+    .step-number { color: #9aacc5; font-size: 10px; font-weight: 700; }
+    .step-icon { width: 43px; height: 43px; display: grid; place-items: center; margin: 14px 0 15px; color: var(--blue); background: #edf4ff; border-radius: 12px; }
+    .step-icon svg { width: 20px; height: 20px; }
+    .step-card h3 { margin: 0 0 7px; font-size: 14px; }
+    .step-card p { margin: 0; color: #8290a4; font-size: 11px; line-height: 1.8; }
+
+    .request-section { padding: 76px 0 82px; background: #edf4fd; }
+    .request-layout { display: grid; grid-template-columns: .72fr 1.28fr; align-items: start; gap: 50px; }
+    .request-intro { padding-top: 14px; }
+    .request-intro h2 { margin: 11px 0 12px; font-size: 31px; letter-spacing: -.9px; line-height: 1.3; }
+    .request-intro > p { margin: 0; color: #74849b; font-size: 12px; line-height: 1.9; }
+    .help-note { display: flex; gap: 11px; margin-top: 26px; padding: 14px; background: #fff; border: 1px solid #e6edf7; border-radius: 12px; }
+    .help-note svg { flex: 0 0 18px; width: 18px; color: #4b83e9; }
+    .help-note strong { display: block; margin-bottom: 3px; font-size: 10px; }
+    .help-note span { color: #8694a8; font-size: 9px; line-height: 1.7; }
+    .form-card { padding: 26px; background: #fff; border: 1px solid #e7edf5; border-radius: 17px; box-shadow: 0 12px 35px #35577a0b; }
+    .form-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 21px; }
+    .form-top h3 { margin: 0 0 5px; font-size: 16px; }
+    .form-top p { margin: 0; color: #8996a9; font-size: 10px; }
+    .required-note { padding-top: 4px; color: #99a4b4; font-size: 9px; white-space: nowrap; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 13px; }
+    .field { min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { display: block; margin-bottom: 7px; color: #445773; font-size: 10px; font-weight: 700; }
+    .field label span { color: #e16f6f; }
+    .field input, .field select, .field textarea, .track-input { width: 100%; padding: 11px 12px; color: #273c5d; background: #fcfdff; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; font-size: 10px; transition: .18s ease; }
+    .field input::placeholder, .field textarea::placeholder, .track-input::placeholder { color: #a6b0bf; }
+    .field input:focus, .field select:focus, .field textarea:focus, .track-input:focus { border-color: #7ea6f2; box-shadow: 0 0 0 3px #2868e814; }
+    .field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23828fa3' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-position: right 12px center; background-repeat: no-repeat; }
+    .field textarea { min-height: 90px; resize: vertical; line-height: 1.7; }
+    .upload-box { position: relative; display: flex; align-items: center; justify-content: center; min-height: 96px; padding: 14px; border: 1px dashed #cbd8e9; border-radius: 9px; background: #fbfdff; text-align: center; transition: .2s; }
+    .upload-box:hover { border-color: #7ea6f2; background: #f6f9ff; }
+    .upload-box input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .upload-content svg { width: 20px; height: 20px; margin-bottom: 4px; color: #5b85ca; }
+    .upload-content strong { display: block; color: #50627d; font-size: 10px; }
+    .upload-content small { display: block; margin-top: 4px; color: #99a5b5; font-size: 8px; }
+    .upload-preview { display: none; align-items: center; gap: 8px; color: #5270a0; font-size: 10px; }
+    .upload-preview.visible { display: flex; }
+    .upload-preview svg { width: 18px; color: #29956f; }
+    .form-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 19px; }
+    .privacy-note { display: flex; align-items: center; gap: 6px; color: #8996a8; font-size: 9px; }
+    .privacy-note svg { width: 13px; color: #6f8dbd; }
+    .form-bottom .button-primary { padding: 12px 16px; font-size: 10px; }
+    .form-message, .track-message { display: none; margin-top: 13px; padding: 11px 13px; color: #247658; background: #eaf8f1; border: 1px solid #d5f0e2; border-radius: 8px; font-size: 10px; line-height: 1.7; }
+    .form-message.visible, .track-message.visible { display: block; }
+
+    .track-section { padding: 65px 0; }
+    .track-card { max-width: 690px; display: flex; align-items: center; gap: 25px; margin: 0 auto; padding: 26px; background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 10px 32px #35577a0a; }
+    .track-symbol { flex: 0 0 48px; height: 48px; display: grid; place-items: center; color: var(--blue); background: #edf4ff; border-radius: 14px; }
+    .track-symbol svg { width: 23px; }
+    .track-info { flex: 1; }
+    .track-info h3 { margin: 0 0 5px; font-size: 14px; }
+    .track-info p { margin: 0; color: #8491a4; font-size: 10px; line-height: 1.7; }
+    .track-form { display: flex; width: 290px; gap: 7px; }
+    .track-input { min-width: 0; padding: 11px 10px; font-size: 10px; }
+    .track-form .button-primary { flex: 0 0 auto; padding: 11px 13px; font-size: 10px; }
+
+    footer { padding: 27px 0; background: #fff; border-top: 1px solid var(--line); }
+    .footer-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .footer-brand { font-size: 13px; }
+    .footer-brand .brand-mark { width: 29px; height: 29px; border-radius: 9px; }
+    .footer-brand .brand-mark svg { width: 16px; }
+    .footer-meta { display: flex; align-items: center; gap: 25px; color: #75849a; font-size: 9px; }
+    .footer-meta span { display: inline-flex; align-items: center; gap: 6px; }
+    .footer-meta svg { width: 13px; color: #5180ca; }
+    .copyright { color: #a0aaba; font-size: 9px; }
+
+    @media (max-width: 820px) {
+      .hero-grid { gap: 28px; }
+      .hero { padding: 62px 0; }
+      .hero-art { min-height: 310px; }
+      .orb { width: 270px; height: 270px; }
+      .request-layout { grid-template-columns: 1fr; gap: 25px; }
+      .request-intro { max-width: 570px; }
+      .help-note { max-width: 390px; margin-top: 18px; }
+    }
+    @media (max-width: 600px) {
+      .container { width: min(100% - 34px, 480px); }
+      .topbar { height: 66px; }
+      .brand { font-size: 17px; }
+      .nav-links { gap: 13px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .nav-cta { padding: 10px 12px; font-size: 11px; }
+      .hero { padding: 48px 0 40px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 20px; }
+      h1 { max-width: 440px; font-size: clamp(37px, 10vw, 48px); letter-spacing: -1.6px; }
+      .hero-copy { font-size: 13px; }
+      .hero-actions { gap: 15px; margin-top: 22px; }
+      .button-primary { padding: 13px 15px; font-size: 11px; }
+      .hero-note { margin-top: 20px; }
+      .hero-art { min-height: 286px; margin-top: 0; }
+      .orb { width: 250px; height: 250px; }
+      .dashboard-card { width: min(100% - 18px, 340px); padding: 18px; }
+      .float-check { right: 0; bottom: 22px; }
+      .section { padding: 56px 0; }
+      .section-heading { margin-bottom: 25px; }
+      .section-heading h2 { font-size: 25px; }
+      .steps { grid-template-columns: 1fr; gap: 11px; }
+      .step-card { display: grid; grid-template-columns: 42px 1fr; column-gap: 13px; padding: 15px; }
+      .step-card:not(:last-child)::after { display: none; }
+      .step-number { grid-column: 1; grid-row: 1; align-self: end; }
+      .step-icon { grid-column: 1; grid-row: 2 / span 2; width: 40px; height: 40px; margin: 8px 0 0; }
+      .step-card h3 { grid-column: 2; grid-row: 1; margin: 0 0 4px; align-self: end; }
+      .step-card p { grid-column: 2; grid-row: 2; }
+      .request-section { padding: 56px 0; }
+      .request-intro h2 { font-size: 27px; }
+      .form-card { padding: 19px 15px; }
+      .form-grid { grid-template-columns: 1fr; gap: 13px; }
+      .field.full { grid-column: auto; }
+      .form-top { margin-bottom: 17px; }
+      .form-bottom { align-items: flex-start; flex-direction: column; }
+      .form-bottom .button-primary { width: 100%; }
+      .track-section { padding: 52px 0; }
+      .track-card { align-items: flex-start; flex-wrap: wrap; gap: 13px; padding: 19px; }
+      .track-info { min-width: calc(100% - 64px); }
+      .track-form { width: 100%; }
+      .track-form .button-primary { width: auto; }
+      .footer-row { align-items: flex-start; flex-direction: column; }
+      .footer-meta { align-items: flex-start; flex-direction: column; gap: 10px; }
+      .copyright { align-self: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav container" aria-label="เมนูหลัก">
+      <a class="brand" href="#home" aria-label="FixFlow หน้าแรก">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14.7 6.3 3 3M5 19l7.2-7.2m2.8-8.1a5 5 0 0 0 6.3 6.3l-5.8 5.8a3 3 0 0 1-4.2-4.2l5.8-5.8Z"/><path d="m5 19 2-2"/></svg></span>
+        <span>Fix<em>Flow</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="#how-it-works">วิธีใช้งาน</a>
+        <a href="#track">ติดตามงาน</a>
+        <a class="nav-cta" href="#request">แจ้งซ่อมเลย <span aria-hidden="true">↗</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow"><span class="eyebrow-dot"></span> แจ้งง่าย ติดตามได้ ทุกขั้นตอน</span>
+          <h1>เรื่องซ่อม<br />ให้เป็นเรื่อง<span>ง่าย</span></h1>
+          <p class="hero-copy">แจ้งปัญหาการใช้งานได้ในไม่กี่ขั้นตอน ทีมช่างพร้อมดูแล และคุณติดตามความคืบหน้าได้ตลอดเวลา</p>
+          <div class="hero-actions">
+            <a class="button-primary" href="#request">แจ้งซ่อมตอนนี้ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+            <a class="text-link" href="#how-it-works">ดูขั้นตอนการทำงาน <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a>
+          </div>
+          <div class="hero-note"><div class="avatar-stack" aria-hidden="true"><span>น</span><span>ช</span><span>อ</span></div><span>ทีมช่างพร้อมดูแลทุกวันทำการ</span></div>
+        </div>
+        <div class="hero-art" aria-label="ตัวอย่างสถานะการซ่อม">
+          <div class="orb" aria-hidden="true"></div>
+          <div class="dashboard-card">
+            <div class="dashboard-head"><span class="dashboard-title">ภาพรวมคำขอแจ้งซ่อม</span><span class="menu-dots" aria-hidden="true">···</span></div>
+            <div class="ticket-preview">
+              <div class="ticket-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></div>
+              <div class="ticket-meta"><div class="ticket-name">ไฟส่องสว่างขัดข้อง</div><div class="ticket-id">Ticket #FX-240831</div></div>
+              <span class="status-pill">กำลังดำเนินการ</span>
+            </div>
+            <div class="progress-label"><span>ความคืบหน้า</span><strong>72%</strong></div>
+            <div class="progress-bar"><span></span></div>
+            <div class="tech-row"><div class="tech-avatar">ช</div><div class="tech-info"><strong>คุณชาญชัย · ช่างไฟฟ้า</strong><small>รับเรื่องแล้ว · วันนี้ 10:42 น.</small></div><span class="star-rating">★ 4.9</span></div>
+          </div>
+          <div class="float-check"><span class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg></span>แจ้งเตือนทุกความคืบหน้า</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-heading"><span class="section-kicker">Simple process</span><h2>แจ้งซ่อมง่าย ๆ ใน 3 ขั้นตอน</h2><p>ไม่ต้องโทรตาม ไม่ต้องคอยถามสถานะ ทุกอย่างจัดการได้ในที่เดียว</p></div>
+        <div class="steps">
+          <article class="step-card"><span class="step-number">01 / แจ้งปัญหา</span><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></span><h3>ส่งคำขอแจ้งซ่อม</h3><p>กรอกรายละเอียดปัญหาและจุดที่พบ พร้อมแนบรูปเพื่อให้ทีมช่างเข้าใจได้ชัดเจน</p></article>
+          <article class="step-card"><span class="step-number">02 / มอบหมายช่าง</span><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3 18 9.6M5 19l7.2-7.2m2.8-8.1a5 5 0 0 0 6.3 6.3l-5.8 5.8a3 3 0 0 1-4.2-4.2l5.8-5.8Z"/></svg></span><h3>ทีมงานรับเรื่อง</h3><p>เจ้าหน้าที่ตรวจสอบและมอบหมายช่างผู้เชี่ยวชาญให้ตรงกับประเภทของปัญหา</p></article>
+          <article class="step-card"><span class="step-number">03 / เรียบร้อย</span><span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="m9 11 3 3L22 4"/></svg></span><h3>ซ่อมเสร็จ พร้อมใช้งาน</h3><p>รับการแจ้งเตือนเมื่อซ่อมเสร็จ และตรวจสอบสถานะได้ด้วย Ticket ID ของคุณ</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="request-section" id="request">
+      <div class="container request-layout">
+        <div class="request-intro"><span class="section-kicker">Repair request</span><h2>มีอะไรให้เราช่วยไหม?</h2><p>กรอกรายละเอียดด้านล่าง แล้วทีมงานจะติดต่อกลับเพื่อดำเนินการโดยเร็วที่สุด</p>
+          <div class="help-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3m.1 4h.01"/></svg><div><strong>ไม่แน่ใจว่าต้องกรอกอะไร?</strong><span>อธิบายอาการคร่าว ๆ ได้เลย ทีมงานจะช่วยประเมินและติดต่อกลับ</span></div></div>
+        </div>
+        <form class="form-card" id="repair-form">
+          <div class="form-top"><div><h3>แบบฟอร์มแจ้งซ่อม</h3><p>ข้อมูลของคุณจะถูกใช้เพื่อประสานงานการซ่อมเท่านั้น</p></div><span class="required-note"><span style="color:#e16f6f">*</span> จำเป็น</span></div>
+          <div class="form-grid">
+            <div class="field"><label for="name">ชื่อ–นามสกุล <span>*</span></label><input id="name" name="name" type="text" placeholder="เช่น สมชาย ใจดี" autocomplete="name" required /></div>
+            <div class="field"><label for="phone">เบอร์โทรศัพท์ <span>*</span></label><input id="phone" name="phone" type="tel" placeholder="08X-XXX-XXXX" autocomplete="tel" required /></div>
+            <div class="field"><label for="location">สถานที่ / เลขห้อง <span>*</span></label><input id="location" name="location" type="text" placeholder="เช่น อาคาร A ชั้น 3 ห้อง 301" required /></div>
+            <div class="field"><label for="category">ประเภทปัญหา <span>*</span></label><select id="category" name="category" required><option value="" disabled selected>เลือกประเภทปัญหา</option><option>ไฟฟ้า</option><option>ประปา</option><option>คอมพิวเตอร์ / IT</option><option>ทั่วไป</option></select></div>
+            <div class="field full"><label for="description">รายละเอียดปัญหา <span>*</span></label><textarea id="description" name="description" placeholder="เล่าอาการหรือปัญหาที่พบ เพื่อให้ทีมช่างเตรียมตัวได้ถูกต้อง" required></textarea></div>
+            <div class="field full"><label for="image">รูปภาพประกอบ <span style="color:#99a4b4;font-weight:400">(ไม่บังคับ)</span></label><div class="upload-box"><input id="image" name="image" type="file" accept="image/*" aria-label="อัปโหลดรูปภาพประกอบ" /><div class="upload-content" id="upload-content"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5M12 3v12"/></svg><strong>คลิกเพื่อเลือกรูป หรือลากไฟล์มาวาง</strong><small>รองรับไฟล์ JPG, PNG (ไม่เกิน 10 MB)</small></div><div class="upload-preview" id="upload-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg><span id="file-name"></span></div></div></div>
+          </div>
+          <div class="form-bottom"><span class="privacy-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>ข้อมูลของคุณปลอดภัยและเป็นส่วนตัว</span><button class="button-primary" type="submit">ส่งคำขอแจ้งซ่อม <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+          <div class="form-message" id="form-message" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="track-section" id="track">
+      <div class="container"><div class="section-heading" style="margin-bottom:24px"><span class="section-kicker">Track your request</span><h2>ติดตามสถานะงานซ่อม</h2><p>มี Ticket ID แล้ว? กรอกเพื่อตรวจสอบความคืบหน้าได้เลย</p></div>
+        <div class="track-card"><div class="track-symbol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35M11 8v3l2 1"/></svg></div><div class="track-info"><h3>ค้นหาด้วย Ticket ID</h3><p>รหัส Ticket ID อยู่ในข้อความยืนยันหลังส่งคำขอ</p></div><form class="track-form" id="track-form"><input class="track-input" id="ticket-id" type="text" placeholder="เช่น FX-240831" aria-label="Ticket ID" required /><button class="button-primary" type="submit">ตรวจสอบ</button></form></div>
+        <div class="track-message" id="track-message" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-row"><a class="brand footer-brand" href="#home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14.7 6.3 3 3M5 19l7.2-7.2m2.8-8.1a5 5 0 0 0 6.3 6.3l-5.8 5.8a3 3 0 0 1-4.2-4.2l5.8-5.8Z"/><path d="m5 19 2-2"/></svg></span><span>Fix<em>Flow</em></span></a><div class="footer-meta"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 8.9a16 16 0 0 0 6 6l1.2-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.8 2.1Z"/></svg>02-XXX-XXXX</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>จันทร์–ศุกร์ 08:30–17:30 น.</span></div><span class="copyright">© 2026 FixFlow · ระบบแจ้งซ่อม</span></div>
+  </footer>
+
+  <script>
+    const imageInput = document.getElementById('image');
+    const uploadContent = document.getElementById('upload-content');
+    const uploadPreview = document.getElementById('upload-preview');
+    const fileName = document.getElementById('file-name');
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) {
+        imageInput.value = '';
+        fileName.textContent = 'ไฟล์มีขนาดเกิน 10 MB กรุณาเลือกไฟล์ใหม่';
+        uploadContent.style.display = 'block';
+        uploadPreview.classList.add('visible');
+        return;
+      }
+      fileName.textContent = file.name;
+      uploadContent.style.display = 'none';
+      uploadPreview.classList.add('visible');
+    });
+
+    document.getElementById('repair-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const ticket = `FX-${Math.floor(100000 + Math.random() * 900000)}`;
+      const message = document.getElementById('form-message');
+      message.textContent = `รับข้อมูลเรียบร้อยแล้ว (ตัวอย่าง) Ticket ID ของคุณคือ ${ticket} · ระบบนี้เป็นหน้าเดโม ยังไม่ได้เชื่อมต่อฐานข้อมูล`;
+      message.classList.add('visible');
+      message.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    document.getElementById('track-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const ticket = document.getElementById('ticket-id').value.trim();
+      const message = document.getElementById('track-message');
+      message.textContent = `Ticket ID: ${ticket} · ระบบติดตามสถานะนี้เป็นตัวอย่าง ยังไม่ได้เชื่อมต่อฐานข้อมูลจริง`;
+      message.classList.add('visible');
+    });
+  </script>
+</body>
+</html>
